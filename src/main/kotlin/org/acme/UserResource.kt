@@ -30,7 +30,7 @@ class UserResource {
         @QueryParam("lng") lng: Float = 0f,
         @QueryParam("notifyInterval") notifyInterval: Long = 1*60*100
         ) {
-        userRepo.addUser(name, active, LatLng(lat,lng), notifyInterval)
+        userRepo.addUser(name, active, LatLon(lat,lng), notifyInterval)
     }
 
     @GET
@@ -54,9 +54,9 @@ class UserResource {
             (name == null || user.name == name) &&
             (active == null || user.active == active) &&
             (minLat == null  || user.latLng.lat >= minLat) &&
-            (minLng == null  || user.latLng.lng >= minLng) &&
+            (minLng == null  || user.latLng.lon >= minLng) &&
             (maxLat == null  || user.latLng.lat >= maxLat) &&
-            (maxLng == null  || user.latLng.lng >= maxLng) &&
+            (maxLng == null  || user.latLng.lon >= maxLng) &&
             (minNotify == null || user.notifyInterval >= minNotify)
         }
     }

@@ -9,8 +9,8 @@ class UserRepo {
 
     var idSeq = 0
 
-    fun addUser(name: String, active: Boolean, latLng: LatLng, notifyInterval: Long){
-        userMap.put(idSeq, User(idSeq,name,active,latLng,notifyInterval))
+    fun addUser(name: String, active: Boolean, latlon: LatLon, notifyInterval: Long){
+        userMap.put(idSeq, User(idSeq,name,active,latlon,notifyInterval))
         idSeq++
     }
     fun getUser(id: Int): User? = userMap[id]

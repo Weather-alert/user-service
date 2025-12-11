@@ -17,11 +17,11 @@ class UserResourceTest {
         // Create user with name "John"
         val name ="John"
         val active = false
-        val latLng = LatLng(10f,11f)
+        val latLng = LatLon(10f,11f)
         val notifyInterval = 1*60
 
         given()
-            .post("/users?name=$name&active=$active&lat=${latLng.lat}&lng=${latLng.lng}&notifyInterval=$notifyInterval")
+            .post("/users?name=$name&active=$active&lat=${latLng.lat}&lon=${latLng.lon}&notifyInterval=$notifyInterval")
             .then()
             .statusCode(204) // Because createUser returns Unit
 
@@ -33,7 +33,7 @@ class UserResourceTest {
             .body("name", equalTo(name))
             .body("active", equalTo(active))
             .body("latLng.lat", equalTo(latLng.lat))
-            .body("latLng.lng",equalTo(latLng.lng))
+            .body("latLng.lon",equalTo(latLng.lon))
             .body("notifyInterval", equalTo(notifyInterval))
         given()
             .delete("/users/0")
