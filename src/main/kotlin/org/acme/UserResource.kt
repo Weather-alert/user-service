@@ -13,6 +13,7 @@ import jakarta.ws.rs.Path
 import jakarta.ws.rs.PathParam
 import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.core.MediaType
+import jakarta.ws.rs.core.Response
 
 @Path("/users")
 @RequestScoped
@@ -20,22 +21,32 @@ class UserResource {
 
     @Inject
     @field:Default
-    lateinit var userRepo: UserRepo
+    lateinit var userService: UserService
 
     @POST
     fun createUser(
         @QueryParam("name") name: String,
         @QueryParam("active") active: Boolean = false,
         @QueryParam("lat") lat: Float = 0f,
-        @QueryParam("lng") lng: Float = 0f,
-        @QueryParam("notifyInterval") notifyInterval: Long = 1*60*100
+        @QueryParam("lon") lon: Float = 0f,
+        @QueryParam("notifyInterval") notifyInterval: Int = 1*60*100
         ) {
-        userRepo.addUser(name, active, LatLon(lat,lng), notifyInterval)
+        userService.addUser(name, active, LatLon(lat,lon), notifyInterval)
     }
 
     @GET
     @Path("{id}")
-    fun returnUser(@PathParam("id") id: Int) = userRepo.getUser(id)
+    fun returnUser(@PathParam("id") id: Int): Response{
+        val user = userService.getUser(id)
+
+        return if(user == null){
+            Response.status(Response.Status.NOT_FOUND)
+              .entity("user $id not found")
+              .build()
+        } else{
+            Response.ok(user).build()
+        }
+    }
 
     @GET
     @Path("")
@@ -44,19 +55,19 @@ class UserResource {
         @QueryParam("name") name: String?,
         @QueryParam("active") active: Boolean?,
         @QueryParam("minLat") minLat: Float?,
-        @QueryParam("minLng") minLng: Float?,
+        @QueryParam("minLon") minLon: Float?,
         @QueryParam("maxLat") maxLat: Float?,
-        @QueryParam("maxLng") maxLng: Float?,
+        @QueryParam("maxLon") maxLon: Float?,
         @QueryParam("minNotify") minNotify: Long?
     ): Map<Int,User> {
-        return userRepo.getUsers().filterValues { user ->
+        return userService.getUsers().filterValues { user ->
             (id == null || user.id == id) &&
             (name == null || user.name == name) &&
             (active == null || user.active == active) &&
-            (minLat == null  || user.latLng.lat >= minLat) &&
-            (minLng == null  || user.latLng.lon >= minLng) &&
-            (maxLat == null  || user.latLng.lat >= maxLat) &&
-            (maxLng == null  || user.latLng.lon >= maxLng) &&
+            (minLat == null  || user.latLon.lat >= minLat) &&
+            (minLon == null  || user.latLon.lon >= minLon) &&
+            (maxLat == null  || user.latLon.lat >= maxLat) &&
+            (maxLon == null  || user.latLon.lon >= maxLon) &&
             (minNotify == null || user.notifyInterval >= minNotify)
         }
     }
@@ -67,18 +78,33 @@ class UserResource {
     fun updateUser(
         @PathParam("id") id: Int,
         request: User
-    ){
-        val user = userRepo.getUser(id) ?: return
-        request.active.let { user.active = it }
-        request.latLng.let { user.latLng = it }
-        request.notifyInterval.let { user.notifyInterval = it }
-        userRepo.updateUser(user.id,user)
+    ): Response{
+        val user = userService.getUser(id)
+        return if(user == null){
+            Response.status(Response.Status.NOT_FOUND)
+                .entity("user $id not found")
+                .build()
+        }else{
+            request.active.let { user.active = it }
+            request.latLon.let { user.latLon = it }
+            request.notifyInterval.let { user.notifyInterval = it }
+
+            userService.updateUser(user.id,user)
+
+            Response.ok().build()
+        }
     }
 
     @DELETE
     @Path("{id}")
-    fun removeUser(@PathParam("id") id: Int ){
-        userRepo.removeUser(id)
-
+    fun removeUser(@PathParam("id") id: Int ): Response{
+        val user = userService.removeUser(id)
+        return if(user == null){
+            Response.status(Response.Status.NOT_FOUND)
+                .entity("user $id not found")
+                .build()
+        }else{
+            Response.ok().build()
+        }
     }
 }
