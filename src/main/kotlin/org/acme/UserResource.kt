@@ -26,12 +26,12 @@ class UserResource {
     @POST
     fun createUser(
         @QueryParam("name") name: String,
-        @QueryParam("active") active: Boolean = false,
-        @QueryParam("lat") lat: Float = 0f,
-        @QueryParam("lon") lon: Float = 0f,
-        @QueryParam("notifyInterval") notifyInterval: Int = 1*60*100
+        @QueryParam("active") active: Boolean?,
+        @QueryParam("lat") lat: Float?,
+        @QueryParam("lon") lon: Float?,
+        @QueryParam("timeIntervalH") timeIntervalH: Int?
         ) {
-        userService.addUser(name, active, LatLon(lat,lon), notifyInterval)
+        userService.addUser(name, active, lat,lon, timeIntervalH)
     }
 
     @GET
@@ -68,7 +68,7 @@ class UserResource {
             (minLon == null  || user.latLon.lon >= minLon) &&
             (maxLat == null  || user.latLon.lat >= maxLat) &&
             (maxLon == null  || user.latLon.lon >= maxLon) &&
-            (minNotify == null || user.notifyInterval >= minNotify)
+            (minNotify == null || user.timeIntervalH >= minNotify)
         }
     }
 
@@ -87,7 +87,7 @@ class UserResource {
         }else{
             request.active.let { user.active = it }
             request.latLon.let { user.latLon = it }
-            request.notifyInterval.let { user.notifyInterval = it }
+            request.timeIntervalH.let { user.timeIntervalH = it }
 
             userService.updateUser(user.id,user)
 
