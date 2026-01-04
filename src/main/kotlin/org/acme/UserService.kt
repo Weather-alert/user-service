@@ -12,37 +12,47 @@ class UserService {
     @field:Default
     private lateinit var weatherServiceClient: WeatherService
 
-    private val userMap = mutableMapOf<Int, User>()
+    private val userMap = mutableMapOf<String, User>()
 
-    var idSeq = 0
+    var seqNum = 0
 
-    fun addUser(name: String?, active: Boolean?, lat: Float?, lon: Float?, timeIntervalH: Int?){
+    fun createUser(id: String, active: Boolean?, lat: Float?, lon: Float?, timeIntervalH: Int?): Response? {
         val finalLat = lat ?: 0f
         val finalLon = lon ?: 0f
         val latLon = LatLon(finalLat,finalLon)
         val finalTimeIntervalH = timeIntervalH ?: 5
 
-        userMap.put(idSeq, User(idSeq, name ?: "null", active ?: false, latLon, finalTimeIntervalH))
-
-        var r = weatherServiceClient.createSubscription(idSeq, timeIntervalH = finalTimeIntervalH, lon = latLon.lon, lat = latLon.lat)
-
-        if(r.status != Response.Status.OK.statusCode){
-            print("Error ${r.entity}")
+        if(userMap.get(id) != null){
+            // user already created
+            return null
         }
 
-        idSeq++
+        userMap[id] = User(
+            seqNum,
+            id,
+            active ?: false,
+            latLon,
+            finalTimeIntervalH
+            )
+        seqNum++
+
+        val r = weatherServiceClient.createSubscription(id, timeIntervalH = finalTimeIntervalH, lon = latLon.lon, lat = latLon.lat)
+        return r
     }
-    fun getUser(id: Int): User? = userMap[id]
+    fun getUser(id: String): User? = userMap[id]
 
-    fun getUsers(): Map<Int, User> = userMap
+    fun getUsers(): Map<String, User> = userMap
 
-    fun updateUser(id: Int, user: User) {
+    fun updateUser(id: String, user: User): Response {
         userMap[id] = user
-        weatherServiceClient.updateSubscription(user.id, user.timeIntervalH, user.latLon.lon, user.latLon.lat, user.active)
+        return weatherServiceClient.updateSubscription(user.id, user.timeIntervalH, user.latLon.lon, user.latLon.lat, user.active)
     }
-    fun removeUser(id: Int){
-        userMap.remove(id)
-        weatherServiceClient.deleteSubscription(id)
+    fun removeUser(id: String): Response?{
+        if (userMap.remove(id) == null){
+            return null
+        }
+        val r = weatherServiceClient.deleteSubscription(id)
+        return r
     }
 
 }

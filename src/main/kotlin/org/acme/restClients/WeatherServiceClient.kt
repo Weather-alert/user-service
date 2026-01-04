@@ -14,7 +14,7 @@ interface WeatherServiceClient {
     @POST
     @Path("/subscription/{id}")
     fun createSubscription(
-        @PathParam("id") id: Int,
+        @PathParam("id") id: String,
         @QueryParam("timeIntervalH") time: Int,
         @QueryParam("lon") lon: Float,
         @QueryParam("lat") lat: Float,
@@ -23,7 +23,7 @@ interface WeatherServiceClient {
     @PATCH
     @Path("/subscription/{id}")
     fun updateSubscription(
-        @PathParam("id") id: Int,
+        @PathParam("id") id: String,
         @QueryParam("timeIntervalH") time: Int,
         @QueryParam("lon") lon: Float,
         @QueryParam("lat") lat: Float,
@@ -32,5 +32,5 @@ interface WeatherServiceClient {
 
     @DELETE
     @Path("/subscription/{id}")
-    fun deleteSubscription(@PathParam("id") id: Int): Response
+    fun deleteSubscription(@PathParam("id") id: String): Response
 }

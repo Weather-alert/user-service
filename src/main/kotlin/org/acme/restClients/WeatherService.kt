@@ -11,7 +11,7 @@ class WeatherService(
     ){
 
     fun createSubscription(
-        id: Int,
+        id: String,
         timeIntervalH: Int,
         lon: Float,
         lat: Float
@@ -19,7 +19,7 @@ class WeatherService(
         return client.createSubscription(id, time = timeIntervalH, lon, lat)
     }
     fun updateSubscription(
-        id: Int,
+        id: String,
         timeIntervalH: Int,
         lon: Float,
         lat: Float,
@@ -28,7 +28,7 @@ class WeatherService(
         return client.updateSubscription(id, time = timeIntervalH, lon, lat, active)
     }
     fun deleteSubscription(
-        id: Int
+        id: String
     ): Response{
         return client.deleteSubscription(id)
     }

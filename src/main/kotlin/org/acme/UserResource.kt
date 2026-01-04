@@ -21,22 +21,32 @@ class UserResource {
 
     @Inject
     @field:Default
-    lateinit var userService: UserService
+    private lateinit var userService: UserService
 
     @POST
     fun createUser(
-        @QueryParam("name") name: String,
+        @QueryParam("id") id: String,
         @QueryParam("active") active: Boolean?,
         @QueryParam("lat") lat: Float?,
         @QueryParam("lon") lon: Float?,
         @QueryParam("timeIntervalH") timeIntervalH: Int?
-        ) {
-        userService.addUser(name, active, lat,lon, timeIntervalH)
+        ): Response {
+        val r = userService.createUser(id, active, lat, lon, timeIntervalH)
+        return if(r == null){
+            Response.status(Response.Status.NOT_ACCEPTABLE)
+                .entity("user with $id already created")
+                .build()
+        }else {
+            if(r.status != Response.Status.OK.statusCode){
+                return r
+            }
+            Response.ok().build()
+        }
     }
 
     @GET
     @Path("{id}")
-    fun returnUser(@PathParam("id") id: Int): Response{
+    fun returnUser(@PathParam("id") id: String): Response{
         val user = userService.getUser(id)
 
         return if(user == null){
@@ -51,18 +61,18 @@ class UserResource {
     @GET
     @Path("")
     fun returnUsers(
-        @QueryParam("id") id :Int?,
-        @QueryParam("name") name: String?,
+        @QueryParam("seqNum") seqNum :Int?,
+        @QueryParam("id") id: String?,
         @QueryParam("active") active: Boolean?,
         @QueryParam("minLat") minLat: Float?,
         @QueryParam("minLon") minLon: Float?,
         @QueryParam("maxLat") maxLat: Float?,
         @QueryParam("maxLon") maxLon: Float?,
         @QueryParam("minNotify") minNotify: Long?
-    ): Map<Int,User> {
+    ): Map<String,User> {
         return userService.getUsers().filterValues { user ->
+            (seqNum == null || user.seqNum == seqNum) &&
             (id == null || user.id == id) &&
-            (name == null || user.name == name) &&
             (active == null || user.active == active) &&
             (minLat == null  || user.latLon.lat >= minLat) &&
             (minLon == null  || user.latLon.lon >= minLon) &&
@@ -76,7 +86,7 @@ class UserResource {
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     fun updateUser(
-        @PathParam("id") id: Int,
+        @PathParam("id") id: String,
         request: User
     ): Response{
         val user = userService.getUser(id)
@@ -89,21 +99,26 @@ class UserResource {
             request.latLon.let { user.latLon = it }
             request.timeIntervalH.let { user.timeIntervalH = it }
 
-            userService.updateUser(user.id,user)
-
+            val r = userService.updateUser(user.id,user)
+            if(r.status != Response.Status.OK.statusCode){
+                return r
+            }
             Response.ok().build()
         }
     }
 
     @DELETE
     @Path("{id}")
-    fun removeUser(@PathParam("id") id: Int ): Response{
+    fun removeUser(@PathParam("id") id: String ): Response{
         val user = userService.removeUser(id)
         return if(user == null){
             Response.status(Response.Status.NOT_FOUND)
                 .entity("user $id not found")
                 .build()
         }else{
+            if (user.status != Response.Status.OK.statusCode){
+                return user
+            }
             Response.ok().build()
         }
     }
