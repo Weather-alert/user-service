@@ -60,6 +60,7 @@ class UserService {
                 active = finalActive
             )
         ){
+            notificationServiceClient.deleteToken(id)
             throw RuntimeException("failed to create Subscription")
         }
         return true
