@@ -1,4 +1,4 @@
-package org.acme.restClients
+package org.acme.weatherClient
 
 import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.PATCH
@@ -18,6 +18,7 @@ interface WeatherServiceClient {
         @QueryParam("timeIntervalH") time: Int,
         @QueryParam("lon") lon: Float,
         @QueryParam("lat") lat: Float,
+        @QueryParam("active") active: Boolean,
     ): Response
 
     @PATCH

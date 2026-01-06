@@ -29,17 +29,20 @@ class UserResource {
         @QueryParam("active") active: Boolean?,
         @QueryParam("lat") lat: Float?,
         @QueryParam("lon") lon: Float?,
-        @QueryParam("timeIntervalH") timeIntervalH: Int?
+        @QueryParam("timeIntervalH") timeIntervalH: Int?,
+        @QueryParam("fcmToken") token: String?,
         ): Response {
-        val r = userService.createUser(id, active, lat, lon, timeIntervalH)
+        println("got token: $token")
+        val r = userService.createUser(id, active, lat, lon, timeIntervalH, token)
         return if(r == null){
-            Response.status(Response.Status.NOT_ACCEPTABLE)
+            Response.status(Response.Status.CONFLICT)
                 .entity("user with $id already created")
                 .build()
-        }else {
-            if(r.status != Response.Status.OK.statusCode){
-                return r
-            }
+        }else if(r == false) {
+            Response.status(Response.Status.NOT_ACCEPTABLE)
+                .entity("Failed to communicate with either notification service and weather service")
+                .build()
+        }else{
             Response.ok().build()
         }
     }
@@ -69,8 +72,9 @@ class UserResource {
         @QueryParam("maxLat") maxLat: Float?,
         @QueryParam("maxLon") maxLon: Float?,
         @QueryParam("minNotify") minNotify: Long?
-    ): Map<String,User> {
-        return userService.getUsers().filterValues { user ->
+    ): List<User> {
+        return userService.getUsers()
+            /*.filterValues { user ->
             (seqNum == null || user.seqNum == seqNum) &&
             (id == null || user.id == id) &&
             (active == null || user.active == active) &&
@@ -80,6 +84,7 @@ class UserResource {
             (maxLon == null  || user.latLon.lon >= maxLon) &&
             (minNotify == null || user.timeIntervalH >= minNotify)
         }
+        */
     }
 
     @PATCH
@@ -87,7 +92,7 @@ class UserResource {
     @Consumes(MediaType.APPLICATION_JSON)
     fun updateUser(
         @PathParam("id") id: String,
-        request: User
+        request: UserUpdateRequest
     ): Response{
         val user = userService.getUser(id)
         return if(user == null){
@@ -95,15 +100,21 @@ class UserResource {
                 .entity("user $id not found")
                 .build()
         }else{
-            request.active.let { user.active = it }
-            request.latLon.let { user.latLon = it }
-            request.timeIntervalH.let { user.timeIntervalH = it }
-
-            val r = userService.updateUser(user.id,user)
-            if(r.status != Response.Status.OK.statusCode){
-                return r
+            request.active?.let { user.active = it }
+            request.latitude?.let { lat->
+                request.longitude?.let { lon->
+                    user.latLon = LatLon(lat,lon)
+                }
             }
-            Response.ok().build()
+            request.timeIntervalH?.let { user.timeIntervalH = it }
+
+            if(userService.updateUser(user.id,user) != true) {
+                Response.status(Response.Status.NOT_ACCEPTABLE)
+                    .entity("Failed to communicate with either notification service and weather service")
+                    .build()
+            }
+            else
+                Response.ok().build()
         }
     }
 
@@ -116,8 +127,10 @@ class UserResource {
                 .entity("user $id not found")
                 .build()
         }else{
-            if (user.status != Response.Status.OK.statusCode){
-                return user
+            if(user == false){
+                Response.status(Response.Status.NOT_ACCEPTABLE)
+                    .entity("Failed to communicate with either notification service and weather service")
+                    .build()
             }
             Response.ok().build()
         }
