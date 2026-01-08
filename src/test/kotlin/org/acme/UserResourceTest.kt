@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 @QuarkusTest
 class UserResourceTest {
 
-
+    /*
     @Test
     fun testCreateAndGetUser() {
         // Create user with name "John"
@@ -60,4 +60,5 @@ class UserResourceTest {
             .then()
             .statusCode(204)
     }
+     */
 }

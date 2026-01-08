@@ -27,3 +27,15 @@ EXPOSE 8080
 USER 1001
 
 ENTRYPOINT ["./application", "-Dquarkus.http.host=0.0.0.0"]
+
+# Use official OpenJDK runtime image
+#FROM amazoncorretto:21
+
+# Copy the jar into the container
+#COPY user-service-1.0.0-SNAPSHOT.jar app.jar
+
+# Expose port (adjust to your service)
+#EXPOSE 8080
+
+# Run the jar
+#ENTRYPOINT ["java", "-jar", "/app.jar"]

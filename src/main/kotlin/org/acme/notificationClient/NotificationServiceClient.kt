@@ -14,7 +14,9 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient
 
-@RegisterRestClient(baseUri = "http://localhost:8084/api/v1/notification")
+
+@RegisterRestClient(configKey = "notification-service")
+@Path("api/v1/notification")
 interface NotificationServiceClient {
 
     @POST

@@ -33,17 +33,24 @@ class UserResource {
         @QueryParam("fcmToken") token: String?,
         ): Response {
         println("got token: $token")
-        val r = userService.createUser(id, active, lat, lon, timeIntervalH, token)
-        return if(r == null){
-            Response.status(Response.Status.CONFLICT)
-                .entity("user with $id already created")
+        try {
+            val r = userService.createUser(id, active, lat, lon, timeIntervalH, token)
+
+            return if(r == null){
+                    Response.status(Response.Status.CONFLICT)
+                        .entity("user with $id already created")
+                        .build()
+                }else if(r == false) {
+                    Response.status(Response.Status.NOT_ACCEPTABLE)
+                        .entity("Failed to communicate with either notification service and weather service")
+                        .build()
+                }else{
+                    Response.ok().build()
+                }
+        } catch(ex: RuntimeException) {
+            return Response.status(Response.Status.CONFLICT)
+                .entity(ex.message)
                 .build()
-        }else if(r == false) {
-            Response.status(Response.Status.NOT_ACCEPTABLE)
-                .entity("Failed to communicate with either notification service and weather service")
-                .build()
-        }else{
-            Response.ok().build()
         }
     }
 

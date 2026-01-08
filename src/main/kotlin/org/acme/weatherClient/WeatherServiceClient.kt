@@ -9,7 +9,8 @@ import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient
 
-@RegisterRestClient(baseUri = "http://localhost:8082/api/v1/weather")
+@RegisterRestClient(configKey = "weather-service")
+@Path("/api/v1/weather")
 interface WeatherServiceClient {
     @POST
     @Path("/subscription/{id}")
