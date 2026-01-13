@@ -1,6 +1,7 @@
 package org.acme
 
 import jakarta.enterprise.context.ApplicationScoped
+import jakarta.enterprise.context.RequestScoped
 import jakarta.enterprise.inject.Default
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
@@ -8,7 +9,7 @@ import jakarta.ws.rs.core.Response
 import org.acme.notificationClient.NotificationService
 import org.acme.weatherClient.WeatherService
 
-@ApplicationScoped
+@RequestScoped
 class UserService {
     @Inject
     @field:Default
