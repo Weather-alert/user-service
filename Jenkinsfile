@@ -28,18 +28,24 @@ spec:
     stages {
         stage('Build & Push') {
             steps {
-                container('maven') {
-                    echo "Building Quarkus App and Pushing to ACR..."
-                    sh """
-                    mvn clean package \
-                      -Dquarkus.container-image.build=true \
-                      -Dquarkus.container-image.push=true \
-                      -Dquarkus.container-image.builder=jib \
-                      -Dquarkus.container-image.group=blaz040 \
-                      -Dquarkus.container-image.name=${IMAGE_NAME} \
-                      -Dquarkus.container-image.username=${DOCKER_USR} \
-                      -Dquarkus.container-image.password=${DOCKER_PSW}
-                    """
+                sh "git clone https://github.com/Weather-alert/weather-alert.git parent-folder"
+
+                // 2. Install it to the local .m2 cache
+                dir('parent-folder') {
+                    container('maven') {
+
+                        echo "Building Quarkus App and Pushing to ACR..."
+                        sh """
+                        mvn clean package \
+                          -Dquarkus.container-image.build=true \
+                          -Dquarkus.container-image.push=true \
+                          -Dquarkus.container-image.builder=jib \
+                          -Dquarkus.container-image.group=blaz040 \
+                          -Dquarkus.container-image.name=${IMAGE_NAME} \
+                          -Dquarkus.container-image.username=${DOCKER_USR} \
+                          -Dquarkus.container-image.password=${DOCKER_PSW}
+                        """
+                    }
                 }
             }
         }
