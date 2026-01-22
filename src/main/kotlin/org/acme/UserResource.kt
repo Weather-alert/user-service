@@ -24,7 +24,7 @@ class UserResource {
     private lateinit var userService: UserService
 
     @GET
-    @Path("hello")
+    @Path("/hello/hello")
     fun hello():Response{
         return Response.ok("hello you just compiled me with CI/CD").build()
     }
