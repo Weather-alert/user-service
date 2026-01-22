@@ -7,7 +7,7 @@
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.jvm -t user-service .
+# docker build -f src/main/docker/Dockerfile -t user-service .
 #
 # Then run the container using:
 #

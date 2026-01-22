@@ -15,7 +15,7 @@ import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 
-@Path("/users")
+@Path("/api/v1/users")
 @RequestScoped
 class UserResource {
 
