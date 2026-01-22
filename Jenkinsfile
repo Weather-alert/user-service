@@ -32,20 +32,23 @@ spec:
 
                 // 2. Install it to the local .m2 cache
                 dir('parent-folder') {
-                    container('maven') {
-
-                        echo "Building Quarkus App and Pushing to ACR..."
-                        sh """
-                        mvn clean package \
-                          -Dquarkus.container-image.build=true \
-                          -Dquarkus.container-image.push=true \
-                          -Dquarkus.container-image.builder=jib \
-                          -Dquarkus.container-image.group=blaz040 \
-                          -Dquarkus.container-image.name=${IMAGE_NAME} \
-                          -Dquarkus.container-image.username=${DOCKER_USR} \
-                          -Dquarkus.container-image.password=${DOCKER_PSW}
-                        """
+                    container('maven'){
+                        sh "mvn install -N"
                     }
+                }
+                container('maven') {
+
+                    echo "Building Quarkus App and Pushing to ACR..."
+                    sh """
+                    mvn clean package \
+                      -Dquarkus.container-image.build=true \
+                      -Dquarkus.container-image.push=true \
+                      -Dquarkus.container-image.builder=jib \
+                      -Dquarkus.container-image.group=blaz040 \
+                      -Dquarkus.container-image.name=${IMAGE_NAME} \
+                      -Dquarkus.container-image.username=${DOCKER_USR} \
+                      -Dquarkus.container-image.password=${DOCKER_PSW}
+                    """
                 }
             }
         }
