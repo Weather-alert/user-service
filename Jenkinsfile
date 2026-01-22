@@ -7,7 +7,7 @@ kind: Pod
 spec:
   containers:
   - name: maven
-    image: maven:3.9-eclipse-temurin-17
+    image: maven:3.9-eclipse-temurin-21
     command: ["sleep"]
     args: ["infinity"]
   - name: k8s-tools
