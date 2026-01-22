@@ -23,6 +23,11 @@ class UserResource {
     @field:Default
     private lateinit var userService: UserService
 
+    @GET
+    @Path("hello")
+    fun hello():Response{
+        return Response.ok("hello you just compiled me with CI/CD").build()
+    }
     @POST
     fun createUser(
         @QueryParam("id") id: String,
