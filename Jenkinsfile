@@ -40,7 +40,7 @@ spec:
 
                     echo "Building Quarkus App and Pushing to ACR..."
                     sh """
-                    mvn clean package \
+                    ./mvnw clean package \
                       -Dquarkus.container-image.build=true \
                       -Dquarkus.container-image.push=true \
                       -Dquarkus.container-image.builder=jib \
